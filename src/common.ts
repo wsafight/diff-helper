@@ -58,7 +58,7 @@ export const coreDiff = <T>(newVal: T, oldVal: T, empty?: EmptyVal) => _coreDiff
 
 interface simpleDiffObjOptions {
 	empty?: EmptyVal
-  diffFun?: (diffObj: any, key: string, newVal: any, oldVal: any) => boolean
+  diffFun?: (key: string, newVal: any, oldVal: any) => boolean
 }
 
 export const simpleObjDiff = (
@@ -86,8 +86,12 @@ export const simpleObjDiff = (
 		checkedKeys.add(key)
     let isChanged = false
 
-    if (hasDiffFun && diffFun(diffFun, key, newVal[key], oldVal[key])) {
-      isChanged = true
+    if (hasDiffFun) {
+      const diffResultByKey = diffFun(key, newVal[key], oldVal[key])
+      if (diffResultByKey) {
+        diffResult[key] = diffResultByKey
+        isChanged = true
+      }
     }
 
     if (isChanged) {
