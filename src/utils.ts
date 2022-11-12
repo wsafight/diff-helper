@@ -9,16 +9,22 @@ export const invariant = (condition: boolean, errorMsg: string) => {
   }
 }
 
-export const isEmpty = (val: any) => {
+export type EmptyVal = null | undefined | ''
+
+export const isEmpty = (val: any): val is EmptyVal => {
   return val === null || val === undefined || val === ''
 }
 
-export const isObject = (val: any) => {
+export const isDate = (val: any): val is Date => {
+  return val instanceof Date
+}
+
+export const isObject = (val: any): val is Object => {
   return val !== null && typeof val === 'object'
 }
 
-export const isDate = (val: any) => {
-  return val instanceof Date
+export const isRealObject = (val: any): val is Record<string, any> => {
+  return isObject(val) && !Array.isArray(val)
 }
 
 export const getOwnKeysForObj = (val: Record<string, any>): string[] => {
@@ -26,11 +32,7 @@ export const getOwnKeysForObj = (val: Record<string, any>): string[] => {
     return []
   }
 
-  if (!isObject(val)) {
-    return []
-  }
-
-  if (Array.isArray(val)) {
+  if (!isRealObject(val)) {
     return []
   }
 

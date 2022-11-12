@@ -1,13 +1,5 @@
 import { getOwnKeysForObj, isEmpty } from "./utils"
 
-export const simpleDiffObj = (
-  oldVal: Record<string, any>,
-  newVal: Record<string, any>,
-) => {
-  const checkedKeys: Set<string> = new Set()
-  
-}
-
 export class ObjectChanger {
   readonly object: Record<string, any>
   private _inital: Record<string, any> = {} 
