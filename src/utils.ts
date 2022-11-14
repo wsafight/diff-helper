@@ -1,8 +1,12 @@
-/**
- * 检测错误并抛出
- * @param condition 是否抛出错误
- * @param errorMsg
- */
+export const enum DataRowStates {
+  Added = 'added',
+  UnChanged = 'unchanged',
+  Modified = 'modified',
+  Deleted = 'deleted'
+}
+
+export const getChangedItem = (newVal: any, _oldVal: any) => newVal
+
 export const invariant = (condition: boolean, errorMsg: string) => {
   if (condition) {
     throw new Error(errorMsg);
@@ -25,6 +29,10 @@ export const isObject = (val: any): val is Object => {
 
 export const isRealObject = (val: any): val is Record<string, any> => {
   return isObject(val) && !Array.isArray(val)
+}
+
+export const hasValForArray = (val: any): val is Array<any> => {
+  return Array.isArray(val) && val.length > 0;
 }
 
 export const getOwnKeysForObj = (val: Record<string, any>): string[] => {
