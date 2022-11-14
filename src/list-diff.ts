@@ -12,8 +12,6 @@ export interface SimpleListDiffOptions extends BaseSimpleListDiffOptions {
   isSplit?: boolean
 }
 
-
-
 const DEFAULT_OPTIONS: SimpleListDiffOptions = {
   key: 'id',
   getChangedItem,
@@ -32,22 +30,13 @@ export const simpleListDiff = (
   oldVal: any[],
   options: SimpleListDiffOptions = DEFAULT_OPTIONS,
 ) => {
-
   if (!hasValForArray(newVal)) {
     return null
   }
 
-  const opts = {
-    ...DEFAULT_OPTIONS,
-    ...options
-  }
+  const opts = { ...DEFAULT_OPTIONS, ...options}
 
-  const {
-    key,
-    getChangedItem,
-    fields,
-    isSplit
-  } = opts
+  const { key, getChangedItem, fields, isSplit } = opts
 
   checkOptions(opts)
 
@@ -139,23 +128,15 @@ export const simpleListDiffWithSort = (
   oldVal: any[],
   options: BaseSimpleListDiffOptions = DEFAULT_OPTIONS,
 ) => {
-
   if (!hasValForArray(newVal)) {
     return null
   }
 
-  const opts = {
-    ...DEFAULT_OPTIONS,
-    ...options
-  }
+  const opts = { ...DEFAULT_OPTIONS, ...options }
 
   checkOptions(opts)
 
-  const {
-    key,
-    getChangedItem,
-    fields,
-  } = opts
+  const { key, getChangedItem, fields, } = opts
 
   if (!hasValForArray(oldVal)) {
     return {
@@ -203,7 +184,6 @@ export const simpleListDiffWithSort = (
       return
     }
     const newLine = newVal.find(x => x[key!] === oldLine[key!])
-
     if (!newLine) {
       retLines.push({ [key!]: oldLine[key!], rowState: DataRowStates.Deleted })
       deletedCount++
