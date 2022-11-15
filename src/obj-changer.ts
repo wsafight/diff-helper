@@ -1,6 +1,6 @@
 import { getOwnKeysForObj, isEmpty } from "./utils"
 
-export class ObjectChanger {
+export class ObjChanger {
   readonly object: Record<string, any>
   private _inital: Record<string, any> = {} 
   constructor(object: Record<string, any>) {

@@ -6,3 +6,7 @@ export {
   simpleListDiffWithSort,
   ListKey,
 } from './list-diff'
+
+export {
+  ObjChanger
+} from './obj-changer'
