@@ -40,6 +40,8 @@ yarn add diff-helper
 | options.diffFun   | 比对函数，返回为 null 时候使用新对象的数值 | (key: string, newVal: any, oldVal: any) => any | undefined |
 | options.needClone | 是否对新属性进行简单（JSON）深拷贝            | boolean                                        | false     |
 
+#### 例子
+
 ```ts
 import { simpleObjDiff } from "diff-helper";
 
@@ -70,11 +72,11 @@ simpleObjDiff(
   { a: [12, 3, 4], b: 11 },
   { a: [1, 2, 3], c: 22 },
   {
-    diffFun: (key, a, b) => {
+    diffFun: (key, newItemVal, oldItemVal) => {
       switch (key) {
         // 处理对象中的属性 a
-        case "a":
-          return a.filter((item: any) => b.includes(item));
+        case 'a':
+          return newItemVal.filter((item: any) => oldItemVal.includes(item));
       }
       return null;
     },
@@ -83,10 +85,11 @@ simpleObjDiff(
 // => { a: [3], b: 11, c: null}
 ```
 
-### 数组比对
+### 数组比对 simpleListDiff
 
-```ts
-```
+#### 参数
+
+#### 例子
 
 ## Changelog
 
