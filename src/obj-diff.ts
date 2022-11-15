@@ -1,8 +1,9 @@
-import { EmptyVal, getOwnKeysForObj, isRealObject } from "./utils"
+import { getOwnKeysForObj, isRealObject } from "./utils"
 
 interface simpleDiffObjOptions {
-  empty?: EmptyVal
-  diffFun?: (key: string, newVal: any, oldVal: any) => boolean
+  empty?: null | ''
+  diffFun?: (key: string, newVal: any, oldVal: any) => any
+  needCopy?: boolean
 }
 
 export const simpleObjDiff = (
@@ -10,10 +11,9 @@ export const simpleObjDiff = (
   oldVal: Record<string, any>,
   {
     empty = null,
-    diffFun
-  }: simpleDiffObjOptions = {
-      empty: null
-    }
+    diffFun,
+    needCopy = false
+  }: simpleDiffObjOptions = { empty: null, needCopy: false }
 ): Record<string, any> => {
   if (!isRealObject(oldVal) || !isRealObject(newVal)) {
     return {}
@@ -43,7 +43,7 @@ export const simpleObjDiff = (
     }
 
     if (JSON.stringify(newVal[key]) !== JSON.stringify(oldVal[key])) {
-      diffResult[key] = newVal
+      diffResult[key] = needCopy ? JSON.parse(JSON.stringify(newVal)) : newVal[key]
     }
   })
 
