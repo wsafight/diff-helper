@@ -1,8 +1,8 @@
 export const enum DataRowStates {
   Added = 'added',
-  UnChanged = 'unchanged',
+  Deleted = 'deleted',
   Modified = 'modified',
-  Deleted = 'deleted'
+  NoChange = 'noChange',
 }
 
 export const getChangedItem = (newVal: any, _oldVal: any) => newVal

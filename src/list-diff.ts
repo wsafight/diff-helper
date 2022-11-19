@@ -174,7 +174,7 @@ export const simpleListDiffWithSort = (
         retLines.push({ ...result, rowState: DataRowStates.Modified })
         modifiedCount++
       } else {
-        retLines.push({ [key!]: newLine[key!], rowState: DataRowStates.UnChanged })
+        retLines.push({ [key!]: newLine[key!], rowState: DataRowStates.NoChange })
       }
     }
   })
