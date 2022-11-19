@@ -1,9 +1,7 @@
-// import { simpleListDiff } from '../src/list-diff'
-
-// console.log(simpleListDiff)
+import { simpleListDiff } from '../src/list-diff'
 
 describe('simple-list-diff', () => {
   it('error-param', () => {
-    expect(1 + 1).toEqual(2);
+    expect(simpleListDiff([], [])).toEqual(null);
   });
 });

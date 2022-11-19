@@ -2,18 +2,31 @@ import { getOwnKeysForObj, isRealObject } from "./utils"
 
 interface simpleDiffObjOptions {
   empty?: null | ''
-  diffFun?: (key: string, newVal: any, oldVal: any) => any
+  diffFun?: (params: {
+    key: string
+    newPropVal: any
+    oldPropVal: any
+  }) => any
   needCopy?: boolean
 }
 
-export const simpleObjDiff = (
+interface SimpleObjDiffParams {
   newVal: Record<string, any>,
   oldVal: Record<string, any>,
-  {
-    empty = null,
-    diffFun,
-    needCopy = false
-  }: simpleDiffObjOptions = { empty: null, needCopy: false }
+  options?: simpleDiffObjOptions
+}
+
+const DEFAULT_OPTIONS: simpleDiffObjOptions = {
+  empty: null,
+  needCopy: false,
+}
+
+
+export const simpleObjDiff = ({
+  newVal,
+  oldVal,
+  options,
+}: SimpleObjDiffParams
 ): Record<string, any> => {
   if (!isRealObject(oldVal) || !isRealObject(newVal)) {
     return {}
@@ -23,6 +36,8 @@ export const simpleObjDiff = (
 
   const checkedKeys: Set<string> = new Set()
 
+  const { diffFun, empty, needCopy } = { ...DEFAULT_OPTIONS, ...options };
+
   const hasDiffFun = typeof diffFun === 'function'
 
   const keys = getOwnKeysForObj(newVal)
@@ -31,8 +46,12 @@ export const simpleObjDiff = (
     let isChanged = false
 
     if (hasDiffFun) {
-      const diffResultByKey = diffFun(key, newVal[key], oldVal[key])
-      if (diffResultByKey) {
+      const diffResultByKey = diffFun({
+        key,
+        newPropVal: newVal[key],
+        oldPropVal: oldVal[key]
+      })
+      if (diffResultByKey !== null && diffResultByKey !== undefined) {
         diffResult[key] = diffResultByKey
         isChanged = true
       }
@@ -55,4 +74,56 @@ export const simpleObjDiff = (
     diffResult[key] = empty
   })
   return diffResult
+}
+
+export const isSimpleObjChange = ({
+  newVal,
+  oldVal,
+  options,
+}: SimpleObjDiffParams
+): boolean => {
+  if (!isRealObject(oldVal) || !isRealObject(newVal)) {
+    return true
+  }
+
+  const checkedKeys: Set<string> = new Set()
+
+  const { diffFun } = { ...DEFAULT_OPTIONS, ...options };
+
+  const hasDiffFun = typeof diffFun === 'function'
+
+  const keys = getOwnKeysForObj(newVal)
+
+  const initialKeys = getOwnKeysForObj(oldVal)
+
+  if (keys.length !== initialKeys.length) {
+    return true
+  }
+
+  for (let key of keys) {
+    checkedKeys.add(key)
+    if (hasDiffFun) {
+      const diffResultByKey = diffFun({
+        key,
+        newPropVal: newVal[key],
+        oldPropVal: oldVal[key]
+      })
+      if (diffResultByKey !== null && diffResultByKey !== undefined) {
+        return true
+      }
+    }
+
+    if (typeof newVal[key] !== typeof oldVal[key] || JSON.stringify(newVal[key]) !== JSON.stringify(oldVal[key])) {
+      return true
+    }
+  }
+
+  for (let key of initialKeys) {
+    if (checkedKeys.has(key)) {
+      continue
+    }
+    return true
+  }
+
+  return false
 }
