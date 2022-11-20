@@ -1,11 +1,16 @@
 import { simpleObjDiff } from '../src/obj-diff'
 
 describe('somple-obj-diff', () => {
+  
   it('error-param', () => {
-    expect(simpleObjDiff({
-      newVal: 1 as any,
-      oldVal: 2 as any,
-    })).toEqual({})
+    try {
+      simpleObjDiff({
+        newVal: 1 as any,
+        oldVal: 2 as any,
+      })
+    } catch(e) {
+      expect(e).toEqual(new Error("params newVal must be a Object"))
+    }
   })
 
   it('remove-item', () => {
