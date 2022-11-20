@@ -71,7 +71,7 @@ export const simpleListDiff = ({
       addedCount++
     } else {
       const result = getChangedItem(newLine, oldLine)
-      if (result) {
+      if (result !== null && result !== undefined) {
         retLines.push({ ...result, rowState: DataRowStates.Modified })
         modifiedCount++
       }
@@ -176,7 +176,7 @@ export const simpleListDiffWithSort = ({
       addedCount++
     } else {
       const result = getChangedItem(newLine, oldLine)
-      if (result) {
+      if (result !== null && result !== undefined) {
         retLines.push({ ...result, rowState: DataRowStates.Modified })
         modifiedCount++
       } else {
