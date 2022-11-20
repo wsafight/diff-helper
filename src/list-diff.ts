@@ -1,7 +1,6 @@
 import { DataRowStates, getChangedItem, hasValForArray, invariant } from "./utils"
 
 export type ListKey = string | number
-
 export interface BaseSimpleListDiffOptions {
   key: string
   getChangedItem: Function
@@ -25,14 +24,17 @@ const checkOptions = (opts: BaseSimpleListDiffOptions) => {
   invariant(getChangedItem && typeof getChangedItem !== 'function', 'options "getChangedItem" must be a function')
 }
 
-export const simpleListDiff = (
-  newVal: any[],
-  oldVal: any[],
-  options: SimpleListDiffOptions = DEFAULT_OPTIONS,
-) => {
-  if (!hasValForArray(newVal)) {
-    return null
-  }
+interface SimpleObjDiffParams {
+  newVal: any[]
+  oldVal: any[]
+  options: SimpleListDiffOptions
+}
+
+export const simpleListDiff = ({
+  newVal, oldVal, options
+}: SimpleObjDiffParams) => {
+  invariant(!Array.isArray(newVal), 'params newVal must be a Array')
+  invariant(!Array.isArray(oldVal), 'params oldVal must be a Array')
 
   const opts = { ...DEFAULT_OPTIONS, ...options}
 
@@ -123,14 +125,18 @@ export const simpleListDiff = (
   }
 }
 
-export const simpleListDiffWithSort = (
-  newVal: any[],
-  oldVal: any[],
-  options: BaseSimpleListDiffOptions = DEFAULT_OPTIONS,
+interface SimpleListDiffWithSortParams {
+  newVal: any[]
+  oldVal: any[]
+  options: BaseSimpleListDiffOptions
+}
+
+export const simpleListDiffWithSort = ({
+  newVal, oldVal, options
+}: SimpleListDiffWithSortParams
 ) => {
-  if (!hasValForArray(newVal)) {
-    return null
-  }
+  invariant(!Array.isArray(newVal), 'params newVal must be a Array')
+  invariant(!Array.isArray(oldVal), 'params oldVal must be a Array')
 
   const opts = { ...DEFAULT_OPTIONS, ...options }
 

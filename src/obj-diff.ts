@@ -1,4 +1,4 @@
-import { getOwnKeysForObj, isRealObject } from "./utils"
+import { getOwnKeysForObj, invariant, isRealObject } from "./utils"
 
 interface simpleDiffObjOptions {
   empty?: null | ''
@@ -28,9 +28,8 @@ export const simpleObjDiff = ({
   options,
 }: SimpleObjDiffParams
 ): Record<string, any> => {
-  if (!isRealObject(oldVal) || !isRealObject(newVal)) {
-    return {}
-  }
+  invariant(!isRealObject(newVal), 'params newVal must be a Object')
+  invariant(!isRealObject(oldVal), 'params oldVal must be a Object')
 
   const diffResult: Record<string, any> = {}
 
