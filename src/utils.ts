@@ -5,7 +5,9 @@ export const enum DataRowStates {
   NoChange = 'noChange',
 }
 
-export const getChangedItem = (newVal: any, _oldVal: any) => newVal
+export const getChangedItem = ({
+  newLine,
+}: any) => newLine
 
 export const invariant = (condition: boolean, errorMsg: string) => {
   if (condition) {

@@ -3,7 +3,10 @@ import { DataRowStates, getChangedItem, hasValForArray, invariant } from "./util
 export type ListKey = string | number
 export interface BaseSimpleListDiffOptions {
   key: string
-  getChangedItem: Function
+  getChangedItem: (params: {
+    newLine: any,
+    oldLine: any,
+  }) => any
   fields?: string[]
 }
 
@@ -64,13 +67,16 @@ export const simpleListDiff = ({
 
   newVal.forEach(newLine => {
     let oldLine: any = oldVal.find(x => x[key] === newLine[key])
-    checkedKeys.add(oldLine[key])
     if (!oldLine) {
       newLine.rowState = DataRowStates.Added
       retLines.push(newLine)
       addedCount++
     } else {
-      const result = getChangedItem(newLine, oldLine)
+      checkedKeys.add(oldLine[key])
+      const result = getChangedItem({
+        newLine,
+        oldLine
+      })
       if (result !== null && result !== undefined) {
         retLines.push({ ...result, rowState: DataRowStates.Modified })
         modifiedCount++
@@ -168,14 +174,17 @@ export const simpleListDiffWithSort = ({
 
   newVal.forEach(newLine => {
     const oldLine: any = oldVal.find(x => x[key!] === newLine[key!])
-    checkedKeys.add(oldLine[key!])
 
     if (!oldLine) {
       newLine.rowState = DataRowStates.Added
       retLines.push(newLine)
       addedCount++
     } else {
-      const result = getChangedItem(newLine, oldLine)
+      checkedKeys.add(oldLine[key!])
+      const result = getChangedItem({
+        newLine,
+        oldLine
+      })
       if (result !== null && result !== undefined) {
         retLines.push({ ...result, rowState: DataRowStates.Modified })
         modifiedCount++
