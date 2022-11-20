@@ -552,8 +552,8 @@ describe('simple-list-diff', () => {
   })
 
   it('change-all-item-all-count', () => {
-    expect(simpleListDiff({
-      newVal: [{ id: 1, cc: 'bbc' }, { bb: '123' }],
+    expect(simpleListDiffWithSort({
+      newVal: [{ bb: '123' }, { id: 1, cc: 'bbc' },],
       oldVal: [{ id: 1, cc: 'bb' }, { id: 2, cc: 'bdf' }],
       options: {
         fields: ['addedCount', 'modifiedCount', 'deletedCount'],
@@ -571,16 +571,15 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
-        isSplit: false
       }
     })).toEqual({
-      lines: [{
+      lines: [ {
+        bb: '123',
+        rowState: 'added',
+      },{
         cc: "bbc",
         id: 1,
         rowState: "modified",
-      }, {
-        bb: '123',
-        rowState: 'added',
       }, {
         id: 2,
         rowState: "deleted",
@@ -588,6 +587,50 @@ describe('simple-list-diff', () => {
       addedCount: 1,
       modifiedCount: 1,
       deletedCount: 1,
+      sortChanged: true
+    })
+  })
+
+  it('change-all-item-all-count', () => {
+    expect(simpleListDiffWithSort({
+      newVal: [{ bb: '123' }, { id: 1, cc: 'bbc' },],
+      oldVal: [{ id: 1, cc: 'bb' }, {id: 3, cc: 234}, { id: 2, cc: 'bdf' }],
+      options: {
+        fields: ['addedCount', 'modifiedCount', 'deletedCount'],
+        getChangedItem: ({
+          newLine,
+          oldLine,
+        }) => {
+          const result = simpleObjDiff({
+            newVal: newLine,
+            oldVal: oldLine,
+          })
+          if (!Object.keys(result).length) {
+            return null
+          }
+          return { id: newLine.id, ...result }
+        },
+        key: 'id',
+      }
+    })).toEqual({
+      lines: [ {
+        bb: '123',
+        rowState: 'added',
+      },{
+        cc: "bbc",
+        id: 1,
+        rowState: "modified",
+      }, {
+        id: 3,
+        rowState: "deleted",
+      }, {
+        id: 2,
+        rowState: "deleted",
+      }],
+      addedCount: 1,
+      modifiedCount: 1,
+      deletedCount: 2,
+      sortChanged: true
     })
   })
 
