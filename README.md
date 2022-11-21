@@ -7,6 +7,8 @@ Read this in other languages: [English](https://github.com/wsafight/diff-helper/
 
 基于实际业务的比对辅助库
 
+开发历程可以参考博客 [手写一个业务数据比对库](https://github.com/wsafight/personBlog/issues/49)
+
 ## 特性
 
 - [x] 基于实际业务的比对
