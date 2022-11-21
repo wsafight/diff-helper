@@ -1,9 +1,10 @@
-import { DataRowStates, getChangedItem, hasValForArray, invariant } from "./utils"
+import { simpleObjDiff } from "./obj-diff"
+import { DataRowStates, hasValForArray, invariant } from "./utils"
 
 export type ListKey = string | number
 export interface BaseSimpleListDiffOptions {
   key: string
-  getChangedItem: (params: {
+  getChangedItem?: (params: {
     newLine: any,
     oldLine: any,
   }) => any
@@ -16,7 +17,6 @@ export interface SimpleListDiffOptions extends BaseSimpleListDiffOptions {
 
 const DEFAULT_OPTIONS: SimpleListDiffOptions = {
   key: 'id',
-  getChangedItem,
   fields: [],
   isSplit: true
 }
@@ -24,7 +24,7 @@ const DEFAULT_OPTIONS: SimpleListDiffOptions = {
 const checkOptions = (opts: BaseSimpleListDiffOptions) => {
   const { key, getChangedItem } = opts
   invariant(typeof key !== 'string' || key.length === 0, 'options "key" must be a no empty string')
-  invariant(getChangedItem && typeof getChangedItem !== 'function', 'options "getChangedItem" must be a function')
+  invariant(!!getChangedItem && typeof getChangedItem !== 'function', 'options "getChangedItem" must be a function')
 }
 
 interface SimpleObjDiffParams {
@@ -41,9 +41,27 @@ export const simpleListDiff = ({
 
   const opts = { ...DEFAULT_OPTIONS, ...options}
 
-  const { key, getChangedItem, fields, isSplit } = opts
-
   checkOptions(opts)
+
+  const { key, fields, isSplit } = opts
+
+  let { getChangedItem } = opts;
+
+  if (!getChangedItem ) {
+    getChangedItem = ({
+      newLine,
+      oldLine,
+    }) => {
+      const result = simpleObjDiff({
+        newVal: newLine,
+        oldVal: oldLine,
+      });
+      if (!Object.keys(result).length) {
+        return null;
+      }
+      return { [key]: newLine[key], ...result };
+    }
+  }
 
   if (!hasValForArray(oldVal)) {
     return {
@@ -73,7 +91,7 @@ export const simpleListDiff = ({
       addedCount++
     } else {
       checkedKeys.add(oldLine[key])
-      const result = getChangedItem({
+      const result = getChangedItem!({
         newLine,
         oldLine
       })
@@ -148,7 +166,25 @@ export const simpleListDiffWithSort = ({
 
   checkOptions(opts)
 
-  const { key, getChangedItem, fields, } = opts
+  const { key, fields, } = opts
+
+  let { getChangedItem } = opts
+
+  if (!getChangedItem) {
+    getChangedItem = ({
+      newLine,
+      oldLine,
+    }) => {
+      const result = simpleObjDiff({
+        newVal: newLine,
+        oldVal: oldLine,
+      });
+      if (!Object.keys(result).length) {
+        return null;
+      }
+      return { [key]: newLine[key], ...result };
+    }
+  }
 
   if (!hasValForArray(oldVal)) {
     return {
@@ -181,7 +217,7 @@ export const simpleListDiffWithSort = ({
       addedCount++
     } else {
       checkedKeys.add(oldLine[key!])
-      const result = getChangedItem({
+      const result = getChangedItem!({
         newLine,
         oldLine
       })

@@ -275,6 +275,33 @@ describe('simple-list-diff', () => {
       newVal: [{ id: 1, cc: 'bbc' }, { bb: '123' }],
       oldVal: [{ id: 1, cc: 'bb' }, { id: 2, cc: 'bdf' }],
       options: {
+        fields: ['addedCount', 'modifiedCount', 'deletedCount'],
+        key: 'id',
+        isSplit: false
+      }
+    })).toEqual({
+      addedCount: 1,
+      modifiedCount: 1,
+      deletedCount: 1,
+      lines: [{
+        cc: 'bbc',
+        id: 1,
+        rowState: "modified",
+      }, {
+        bb: '123', rowState: 'added'
+      }, {
+        id: 2,
+        rowState: 'deleted'
+      }],
+    })
+  })
+
+
+  it('change-all-item-all-count', () => {
+    expect(simpleListDiff({
+      newVal: [{ id: 1, cc: 'bbc' }, { bb: '123' }],
+      oldVal: [{ id: 1, cc: 'bb' }, { id: 2, cc: 'bdf' }],
+      options: {
         fields: ['addedCount',],
         getChangedItem: ({
           newLine,
