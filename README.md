@@ -107,7 +107,7 @@ simpleObjDiff({
 | :-- | :--| :-- | :-- |
 | newVal | 新数组 | any[] | - |
 | oldVal | 老数组 | any[] | - |
-| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine}) => newLine |
+| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
 | options.key | 主键,对象判定的唯一值 | string | 'id' |
 | options.isSplit | 是否进行拆分，不拆分则是一个携带 rowState 的对象数组 | boolean | true |
 | options.fields | 多返回的数据,isSplit 不为 false 时候一般不需要改参数 | ['addedCount','deletedCount', 'modifiedCount'] | [] |
@@ -125,7 +125,7 @@ simpleListDiff({
     cc: "bb",
   }],
   options: {
-    // 获取修改之后的参数
+    // 获取修改之后的参数，默认函数类似使用了如下代码
     getChangedItem: ({
       newLine,
       oldLine,
@@ -154,6 +154,28 @@ result = {
   modifiedLines: [],
 };
 
+// 可以不传递 getChangedItem。默认使用了 simpleObjDiff
+simpleListDiff({
+  newVal: [{
+    id: 1,
+    cc: "bb",
+  }],
+  oldVal: [{
+    id: 1,
+    cc: "bb",
+  }],
+  options: {
+    // 主键为 id
+    key: "id",
+  },
+});
+// 没有任何添加修改和删除
+result = {
+  addedLines: [],
+  deletedLines: [],
+  modifiedLines: [],
+};
+
 simpleListDiff({
   newVal: [{
     id: 1,
@@ -169,19 +191,6 @@ simpleListDiff({
     cc: "bdf",
   }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -196,19 +205,6 @@ simpleListDiff({
   newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
   oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
     // 是否进行拆分
     isSplit: false,
@@ -237,19 +233,6 @@ simpleListDiff({
   newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
   oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
     // 是否进行拆分
     isSplit: false,
@@ -290,7 +273,7 @@ result = {
 | :-- | :--| :-- | :-- |
 | newVal | 新数组 | any[] | - |
 | oldVal | 老数组 | any[] | - |
-| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine}) => newLine |
+| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
 | options.key | 主键,对象判定的唯一值 | string | 'id' |
 | options.fields | 多返回的数据 | ['addedCount','deletedCount', 'modifiedCount'] | [] |
 
@@ -312,19 +295,6 @@ simpleListDiffWithSort({
     cc: "bdf",
   }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -354,19 +324,6 @@ simpleListDiffWithSort({
       "modifiedCount",
       "deletedCount",
     ],
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -392,19 +349,6 @@ simpleListDiffWithSort({
   newVal: [{ bb: "123" }, { id: 1, cc: "bbc" }],
   oldVal: [{ id: 1, cc: "bb" }, { id: 3, cc: 234 }, { id: 2, cc: "bdf" }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -432,6 +376,8 @@ result = {
 ```
 
 ## Changelog
+- 0.0.5 为 simpleListDiff 和 simpleListDiffWithSort 的 options.getChangedItem 配置可用的默认项
+
 - 0.0.4 添加了 simpleListDiff 和 simpleListDiffWithSort 函数以及测试
 
 - 0.0.3 修复了 simpleObjDiff diffFun 返回 false 问题，修改了 simpleObjDiff 传参结构，添加了

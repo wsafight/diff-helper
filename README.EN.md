@@ -106,7 +106,7 @@ This method can be used to obtain the comparison result of two data rows. You ne
 | :-- | :--| :-- | :-- |
 | newVal | new array | any[] | -  |
 | oldVal | old array | any[] | -  |
-| options.getChangedItem | Comparison function, if it returns null, it is considered that there is no modification, otherwise it returns the difference value of the two objects | ({newLine, oldLine}) => any | ({newLine}) => newLine |
+| options.getChangedItem | Comparison function, if it returns null, it is considered that there is no modification, otherwise it returns the difference value of the two objects | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
 | options.key | 
 Primary key, the unique value determined by the object | string | 'id' |
 | options.isSplit | Whether to split or not, it is an object array carrying rowState | boolean | true |
@@ -125,7 +125,7 @@ simpleListDiff({
     cc: "bb",
   }],
   options: {
-    // Get the modified parameters
+    // To get the modified parameters, the default function is similar to the following code
     getChangedItem: ({
       newLine,
       oldLine,
@@ -154,6 +154,7 @@ result = {
   modifiedLines: [],
 };
 
+// getChangedItem may not be passed. By default simpleObjDiff is used
 simpleListDiff({
   newVal: [{
     id: 1,
@@ -169,19 +170,6 @@ simpleListDiff({
     cc: "bdf",
   }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -196,19 +184,6 @@ simpleListDiff({
   newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
   oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
     // whether to split
     isSplit: false,
@@ -237,19 +212,6 @@ simpleListDiff({
   newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
   oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
     // whether to split
     isSplit: false,
@@ -290,7 +252,7 @@ This method can be used to obtain the comparison result of two data rows. At the
 | :-- | :--| :-- | :-- |
 | newVal | new array | any[] | - |
 | oldVal | old array | any[] | - |
-| options.getChangedItem | Comparison function, if it returns null, it is considered that there is no modification, otherwise it returns the difference value of the two objects | ({newLine, oldLine}) => any | ({newLine}) => newLine |
+| options.getChangedItem | Comparison function, if it returns null, it is considered that there is no modification, otherwise it returns the difference value of the two objects | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
 | options.key | 
 Primary key, the unique value determined by the object | string | 'id' |
 | options.fields | Multiple returned data | ['addedCount','deletedCount', 'modifiedCount'] | [] |
@@ -313,19 +275,6 @@ simpleListDiffWithSort({
     cc: "bdf",
   }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -355,19 +304,6 @@ simpleListDiffWithSort({
       "modifiedCount",
       "deletedCount",
     ],
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -393,19 +329,6 @@ simpleListDiffWithSort({
   newVal: [{ bb: "123" }, { id: 1, cc: "bbc" }],
   oldVal: [{ id: 1, cc: "bb" }, { id: 3, cc: 234 }, { id: 2, cc: "bdf" }],
   options: {
-    getChangedItem: ({
-      newLine,
-      oldLine,
-    }) => {
-      const result = simpleObjDiff({
-        newVal: newLine,
-        oldVal: oldLine,
-      });
-      if (!Object.keys(result).length) {
-        return null;
-      }
-      return { id: newLine.id, ...result };
-    },
     key: "id",
   },
 });
@@ -433,6 +356,8 @@ result = {
 ```
 
 ## Changelog
+- 0.0.5 Configure available default items for options.getChangedItem of simpleListDiff and simpleListDiffWithSort
+
 - 0.0.4 Added simpleListDiff and simpleListDiffWithSort functions and tests
 
 - 0.0.3 Fixed the problem that simpleObjDiff diffFun returned false, modified the simpleObjDiff parameter passing structure, and added isSimpleObjChange function
