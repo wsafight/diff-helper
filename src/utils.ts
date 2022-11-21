@@ -1,13 +1,11 @@
+const OBJECT_TYPE = '[object Object]'
+
 export const enum DataRowStates {
   Added = 'added',
   Deleted = 'deleted',
   Modified = 'modified',
   NoChange = 'noChange',
 }
-
-export const getChangedItem = ({
-  newLine,
-}: any) => newLine
 
 export const invariant = (condition: boolean, errorMsg: string) => {
   if (condition) {
@@ -30,7 +28,7 @@ export const isObject = (val: any): val is Object => {
 }
 
 export const isRealObject = (val: any): val is Record<string, any> => {
-  return isObject(val) && !Array.isArray(val)
+  return Object.prototype.toString.call(val) === OBJECT_TYPE
 }
 
 export const hasValForArray = (val: any): val is Array<any> => {
