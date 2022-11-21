@@ -36,13 +36,13 @@ yarn add diff-helper
 
 #### 参数
 
-| 参数                | 说明                       | 类型                                             | 默认值       |
-| :---------------- | :----------------------- | :--------------------------------------------- | :-------- |
-| newVal            | 新对象                      | Record<string,any>                             | -         |
-| oldVal            | 老对象                      | Record<string,any>                             | -         |
-| options.empty     | 属性删除时的属性值                | null ｜ ''                                      | null      |
-| options.diffFun   | 比对函数，返回为 null 时候使用新对象的数值 | (key: string, newVal: any, oldVal: any) => any | undefined |
-| options.needClone | 是否对新属性进行简单（JSON）深拷贝      | boolean                                        | false     |
+| 参数 | 说明 | 类型 | 默认值 |
+| :-- | :--| :-- | :-- |
+| newVal | 新对象 | Record<string,any> | - |
+| oldVal | 老对象 | Record<string,any> | - |
+| options.empty | 属性删除时的属性值 | null ｜ '' | null |
+| options.diffFun | 比对函数，返回为 null 时候使用新对象的数值 | (key: string, newVal: any, oldVal: any) => any | undefined |
+| options.needClone | 是否对新属性进行简单（JSON）深拷贝 | boolean | false |
 
 #### 例子
 
@@ -103,14 +103,14 @@ simpleObjDiff({
 
 #### 参数
 
-| 参数                     | 说明                                 | 类型                                             | 默认值                    |
-| :--------------------- | :--------------------------------- | :--------------------------------------------- | :--------------------- |
-| newVal                 | 新数组                                | any[]                                          | -                      |
-| oldVal                 | 老数组                                | any[]                                          | -                      |
-| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any                    | ({newLine}) => newLine |
-| options.key            | 主键,对象判定的唯一值                        | string                                         | 'id'                   |
-| options.isSplit        | 是否进行拆分，不拆分则是一个携带 rowState 的对象数组    | boolean                                        | true                   |
-| options.fields         | 多返回的数据,isSplit 不为 false 时候一般不需要改参数 | ['addedCount','deletedCount', 'modifiedCount'] | []                     |
+| 参数 | 说明 | 类型 | 默认值 |
+| :-- | :--| :-- | :-- |
+| newVal | 新数组 | any[] | - |
+| oldVal | 老数组 | any[] | - |
+| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine}) => newLine |
+| options.key | 主键,对象判定的唯一值 | string | 'id' |
+| options.isSplit | 是否进行拆分，不拆分则是一个携带 rowState 的对象数组 | boolean | true |
+| options.fields | 多返回的数据,isSplit 不为 false 时候一般不需要改参数 | ['addedCount','deletedCount', 'modifiedCount'] | [] |
 
 #### 例子
 
@@ -286,13 +286,13 @@ result = {
 
 #### 参数
 
-| 参数                     | 说明                                 | 类型                                             | 默认值                    |
-| :--------------------- | :--------------------------------- | :--------------------------------------------- | :--------------------- |
-| newVal                 | 新数组                                | any[]                                          | -                      |
-| oldVal                 | 老数组                                | any[]                                          | -                      |
-| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any                    | ({newLine}) => newLine |
-| options.key            | 主键,对象判定的唯一值                        | string                                         | 'id'                   |
-| options.fields         | 多返回的数据                             | ['addedCount','deletedCount', 'modifiedCount'] | []                     |
+| 参数 | 说明 | 类型 | 默认值 |
+| :-- | :--| :-- | :-- |
+| newVal | 新数组 | any[] | - |
+| oldVal | 老数组 | any[] | - |
+| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine}) => newLine |
+| options.key | 主键,对象判定的唯一值 | string | 'id' |
+| options.fields | 多返回的数据 | ['addedCount','deletedCount', 'modifiedCount'] | [] |
 
 #### 例子
 
