@@ -3,7 +3,7 @@
 [![Build Status](https://www.travis-ci.org/wsafight/diff-helper.svg?branch=main)](https://www.travis-ci.org/wsafight/diff-helper)
 [![NPM Version](https://badgen.net/npm/v/diff-helper)](https://www.npmjs.com/package/diff-helper)
 
-Read this in other languages: [English](https://github.com/wsafight/diff-help/blob/main/README.EN.md)
+Read this in other languages: [English](https://github.com/wsafight/diff-helper/blob/main/README.EN.md)
 
 基于实际业务的比对辅助库
 
