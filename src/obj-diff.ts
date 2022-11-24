@@ -1,4 +1,4 @@
-import { getOwnKeysForObj, invariant, isRealObject } from "./utils"
+import { basicDiffParams, getOwnKeysForObj, invariant, isRealObject } from "./utils"
 
 interface simpleDiffObjOptions {
   empty?: null | ''
@@ -10,9 +10,7 @@ interface simpleDiffObjOptions {
   needCopy?: boolean
 }
 
-interface SimpleObjDiffParams {
-  newVal: Record<string, any>,
-  oldVal: Record<string, any>,
+interface SimpleObjDiffParams extends basicDiffParams<Record<string, any>>  {
   options?: simpleDiffObjOptions
 }
 

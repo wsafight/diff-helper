@@ -1,5 +1,5 @@
 import { simpleObjDiff } from "./obj-diff"
-import { DataRowStates, hasValForArray, invariant } from "./utils"
+import { basicDiffParams, DataRowStates, hasValForArray, invariant } from "./utils"
 
 export type ListKey = string | number
 export interface BaseSimpleListDiffOptions {
@@ -27,9 +27,7 @@ const checkOptions = (opts: BaseSimpleListDiffOptions) => {
   invariant(!!getChangedItem && typeof getChangedItem !== 'function', 'options "getChangedItem" must be a function')
 }
 
-interface SimpleObjDiffParams {
-  newVal: any[]
-  oldVal: any[]
+interface SimpleObjDiffParams extends basicDiffParams<any[]> {
   options: SimpleListDiffOptions
 }
 
@@ -149,9 +147,7 @@ export const simpleListDiff = ({
   }
 }
 
-interface SimpleListDiffWithSortParams {
-  newVal: any[]
-  oldVal: any[]
+interface SimpleListDiffWithSortParams extends basicDiffParams<any[]> {
   options: BaseSimpleListDiffOptions
 }
 
