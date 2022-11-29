@@ -58,7 +58,7 @@ export const simpleObjDiff = ({
       return
     }
 
-    if (JSON.stringify(newVal[key]) !== JSON.stringify(oldVal[key])) {
+    if (typeof newVal[key] !== typeof oldVal[key] || JSON.stringify(newVal[key]) !== JSON.stringify(oldVal[key])) {
       diffResult[key] = needCopy ? JSON.parse(JSON.stringify(newVal)) : newVal[key]
     }
   })
