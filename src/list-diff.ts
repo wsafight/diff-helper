@@ -79,6 +79,8 @@ export const simpleListDiff = ({
 
   const retLines: any[] = []
 
+  let sortChanged: boolean = false
+
   let addedCount: number = 0
   let modifiedCount: number = 0
   let deletedCount: number = 0
@@ -87,32 +89,47 @@ export const simpleListDiff = ({
 
   newVal.forEach((newLine, index: number) => {
 
-    const sortParams: Record<string, any> = {}
+    let oldLineIndex: any = oldVal.findIndex(x => x[key] === newLine[key])
 
-    if (hasSortName) {
-      sortParams[sortName] = index + 1
-    }
-
-    let oldLine: any = oldVal.find(x => x[key] === newLine[key])
-    if (!oldLine) {
+    if (oldLineIndex === -1) {
       retLines.push({
         ...newLine,
-        ...sortParams,
-        rowState: DataRowStates.Added
+        rowState: DataRowStates.Added,
+        ...hasSortName && { [sortName]: index + 1 }
       })
+      sortChanged = true
       addedCount++
     } else {
+      const oldLine = oldVal[oldLineIndex]
+
+      const isIndexChanged = index !== oldLineIndex
+
+      if (isIndexChanged) {
+        sortChanged = true
+      }
+      
+      const addSortParams = hasSortName && index !== oldLineIndex
+
       checkedKeys.add(oldLine[key])
+
       const result = getChangedItem!({
         newLine,
         oldLine
       })
-      if (result !== null && result !== undefined) {
-        retLines.push({ ...result, ...sortParams, rowState: DataRowStates.Modified })
+      if (result !== null && result !== undefined) {    
+        retLines.push({
+          ...result, 
+          rowState: DataRowStates.Modified,
+          ...addSortParams && {[sortName]: index + 1}
+        })
         modifiedCount++
       } else {
-        if (hasSortName) {
-          retLines.push({ [key!]: newLine[key!], ...sortParams, rowState: DataRowStates.NoChange })
+        if (addSortParams) {
+          retLines.push({ 
+            [key!]: newLine[key!], 
+            rowState: DataRowStates.NoChange,
+            [sortName]: index + 1,
+          })
         }
       }
     }
@@ -158,19 +175,6 @@ export const simpleListDiff = ({
     }
   } else {
     dataToSet.lines = retLines
-  }
-
-  let sortChanged: boolean = false
-
-  if (addedCount !== 0 || deletedCount !== 0) {
-    sortChanged = true
-  } else {
-    for (let i = 0; i < newVal.length; i++) {
-      if (newVal[i][key!] !== oldVal[i][key!]) {
-        sortChanged = true
-        break
-      }
-    }
   }
 
   return {

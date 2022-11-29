@@ -396,11 +396,7 @@ describe('simple-list-diff', () => {
         sortName: 'index'
       }
     })).toEqual({
-      lines: [{
-        id: 1,
-        rowState: 'noChange',
-        index: 1,
-      }],
+      lines: [],
       sortChanged: false,
     })
   })
@@ -458,10 +454,6 @@ describe('simple-list-diff', () => {
       }
     })).toEqual({
       lines: [{
-        id: 1,
-        rowState: 'noChange',
-        11: 1
-      }, {
         id: 2,
         cc: 'bbc',
         rowState: 'added',
@@ -692,10 +684,6 @@ describe('simple-list-diff', () => {
         rowState: 'noChange',
         index: 1
       }, {
-        id: 3,
-        rowState: 'noChange',
-        index: 2
-      }, {
         id: 1,
         rowState: "noChange",
         index: 3
@@ -737,10 +725,6 @@ describe('simple-list-diff', () => {
         rowState: 'noChange',
         index: 1
       }, {
-        id: 3,
-        rowState: 'noChange',
-        index: 2
-      }, {
         id: 1,
         rowState: "noChange",
         index: 3
@@ -748,7 +732,7 @@ describe('simple-list-diff', () => {
       addedCount: 0,
       modifiedCount: 0,
       deletedCount: 0,
-      sortChanged: true,
+      sortChanged: true
     })
   })
 
