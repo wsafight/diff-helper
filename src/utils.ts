@@ -2,13 +2,6 @@ export const OBJECT_TYPE: string = '[object Object]'
 export const ARRAY_TYPE: string = '[object Array]'
 export const FUNCTION_TYPE: string = '[object Function]'
 
-export const enum DataRowStates {
-  Added = 'added',
-  Deleted = 'deleted',
-  Modified = 'modified',
-  NoChange = 'noChange',
-}
-
 export interface basicDiffParams<T> {
   newVal: T
   oldVal: T

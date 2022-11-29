@@ -1,28 +1,21 @@
 import { simpleObjDiff } from "./obj-diff"
-import { basicDiffParams, DataRowStates, hasValForArray, invariant } from "./utils"
+import { basicDiffParams, hasValForArray, invariant } from "./utils"
 
 export type ListKey = string | number
-export interface BaseSimpleListDiffOptions {
+export interface SimpleListDiffOptions {
   key: string
   getChangedItem?: (params: {
     newLine: any,
     oldLine: any,
   }) => any
-  fields?: string[]
   sortName?: string;
-}
-
-export interface SimpleListDiffOptions extends BaseSimpleListDiffOptions {
-  isSplit?: boolean
 }
 
 const DEFAULT_OPTIONS: SimpleListDiffOptions = {
   key: 'id',
-  fields: [],
-  isSplit: true
 }
 
-const checkOptions = (opts: BaseSimpleListDiffOptions) => {
+const checkOptions = (opts: SimpleListDiffOptions) => {
   const { key, getChangedItem } = opts
   invariant(typeof key !== 'string' || key.length === 0, 'options "key" must be a no empty string')
   invariant(!!getChangedItem && typeof getChangedItem !== 'function', 'options "getChangedItem" must be a function')
@@ -42,7 +35,7 @@ export const simpleListDiff = ({
 
   checkOptions(opts)
 
-  const { key, fields, isSplit, sortName = '' } = opts
+  const { key, sortName = '' } = opts
 
   const hasSortName: boolean = typeof sortName === 'string' && sortName.length > 0
 
@@ -66,24 +59,21 @@ export const simpleListDiff = ({
 
   if (!hasValForArray(oldVal)) {
     return {
-      ...fields?.includes('modifiedCount') && { modifiedCount: 0 },
-      ...fields?.includes('addedCount') && { addedCount: newVal.length },
-      ...fields?.includes('deletedCount') && { deletedCount: 0 },
       ...hasSortName && { sortChanged: true },
-      [isSplit ? 'line' : 'addedLines']: newVal.map(item => ({
+      addedLines: newVal.map(item => ({
         ...item,
-        rowState: DataRowStates.Added,
       })),
+      deletedLines: [],
+      modifiedLines: [],
+      ...hasSortName && { noChangeLines: [] },
     }
   }
 
-  const retLines: any[] = []
-
-  let sortChanged: boolean = false
-
-  let addedCount: number = 0
-  let modifiedCount: number = 0
-  let deletedCount: number = 0
+  // 设定增删改数
+  const addedLines: any[] = [];
+  const deletedLines: any[] = [];
+  const modifiedLines: any[] = [];
+  const noChangeLines: any[] = [];
 
   const checkedKeys: Set<ListKey> = new Set<ListKey>();
 
@@ -92,22 +82,13 @@ export const simpleListDiff = ({
     let oldLineIndex: any = oldVal.findIndex(x => x[key] === newLine[key])
 
     if (oldLineIndex === -1) {
-      retLines.push({
+      addedLines.push({
         ...newLine,
-        rowState: DataRowStates.Added,
         ...hasSortName && { [sortName]: index + 1 }
       })
-      sortChanged = true
-      addedCount++
     } else {
       const oldLine = oldVal[oldLineIndex]
 
-      const isIndexChanged = index !== oldLineIndex
-
-      if (isIndexChanged) {
-        sortChanged = true
-      }
-      
       const addSortParams = hasSortName && index !== oldLineIndex
 
       checkedKeys.add(oldLine[key])
@@ -117,17 +98,14 @@ export const simpleListDiff = ({
         oldLine
       })
       if (result !== null && result !== undefined) {    
-        retLines.push({
+        modifiedLines.push({
           ...result, 
-          rowState: DataRowStates.Modified,
           ...addSortParams && {[sortName]: index + 1}
         })
-        modifiedCount++
       } else {
         if (addSortParams) {
-          retLines.push({ 
+          noChangeLines.push({ 
             [key!]: newLine[key!], 
-            rowState: DataRowStates.NoChange,
             [sortName]: index + 1,
           })
         }
@@ -139,49 +117,13 @@ export const simpleListDiff = ({
     if (checkedKeys.has(oldLine[key])) {
       return
     }
-    retLines.push({ [key]: oldLine[key], rowState: DataRowStates.Deleted })
-    deletedCount++
+    deletedLines.push({ [key]: oldLine[key] })
   })
 
-  const dataToSet: Record<string, any> = {}
-
-  if (isSplit) {
-    const addedLines: any[] = []
-    const deletedLines: any[] = []
-    const modifiedLines: any[] = []
-    const noChangeLines: any[] = []
-    retLines.forEach(item => {
-      const { rowState, ...rowLine } = item
-      switch (rowState) {
-        case DataRowStates.Added:
-          addedLines.push(rowLine)
-          break;
-        case DataRowStates.Deleted:
-          deletedLines.push(rowLine)
-          break;
-        case DataRowStates.Modified:
-          modifiedLines.push(rowLine)
-          break;
-        case DataRowStates.NoChange:
-          noChangeLines.push(rowLine)
-          break;
-      }
-    })
-    dataToSet.addedLines = addedLines
-    dataToSet.deletedLines = deletedLines
-    dataToSet.modifiedLines = modifiedLines
-    if (hasSortName) {
-      dataToSet.noChangeLines = noChangeLines
-    }
-  } else {
-    dataToSet.lines = retLines
-  }
-
   return {
-    ...fields?.includes('modifiedCount') && { modifiedCount },
-    ...fields?.includes('addedCount') && { addedCount },
-    ...fields?.includes('deletedCount') && { deletedCount },
-    ...hasSortName && { sortChanged },
-    ...dataToSet
+    addedLines,
+    deletedLines,
+    modifiedLines,
+    ...hasSortName && { noChangeLines },
   }
 }
