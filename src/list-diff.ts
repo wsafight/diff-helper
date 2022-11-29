@@ -69,6 +69,7 @@ export const simpleListDiff = ({
       ...fields?.includes('modifiedCount') && { modifiedCount: 0 },
       ...fields?.includes('addedCount') && { addedCount: newVal.length },
       ...fields?.includes('deletedCount') && { deletedCount: 0 },
+      ...hasSortName && { sortChanged: true },
       [isSplit ? 'line' : 'addedLines']: newVal.map(item => ({
         ...item,
         rowState: DataRowStates.Added,
