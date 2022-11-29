@@ -6,6 +6,5 @@ export {
 export { 
   SimpleListDiffOptions, 
   simpleListDiff,
-  simpleListDiffWithSort,
   ListKey,
 } from './list-diff'
