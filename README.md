@@ -86,12 +86,17 @@ simpleObjDiff({
   newVal: { a: [12, 3, 4], b: 11 },
   oldVal: { a: [1, 2, 3], c: 22 },
   options: {
-    diffFun: (key, newItemVal, oldItemVal) => {
+    diffFun: ({
+      key,
+      newPropVal,
+      oldPropVal,
+    }) => {
       switch (key) {
         // 处理对象中的属性 a
         case "a":
-          return newItemVal.filter((item: any) => oldItemVal.includes(item));
+          return newPropVal.filter((item: any) => oldPropVal.includes(item));
       }
+      // 其他我们选择不处理，使用默认的 JSON.stringify
       return null;
     },
   },
