@@ -1,7 +1,7 @@
 import { basicDiffParams, getOwnKeysForObj, invariant, isRealObject } from "./utils"
 
 interface simpleDiffObjOptions {
-  empty?: null | ''
+  empty?: any
   diffFun?: (params: {
     key: string
     newPropVal: any

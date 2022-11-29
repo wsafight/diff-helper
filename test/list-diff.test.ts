@@ -1,4 +1,4 @@
-import { simpleListDiff, simpleListDiffWithSort } from '../src/list-diff'
+import { simpleListDiff } from '../src/list-diff'
 import { simpleObjDiff } from '../src/obj-diff'
 
 describe('simple-list-diff', () => {
@@ -372,23 +372,9 @@ describe('simple-list-diff', () => {
   })
 
 
-  it('error-param', () => {
-    try {
-      simpleListDiffWithSort({
-        newVal: 1 as any,
-        oldVal: 2 as any,
-        options: {
-          key: 'id',
-          getChangedItem: () => { }
-        }
-      })
-    } catch (e) {
-      expect(e).toEqual(new Error("params newVal must be a Array"))
-    }
-  })
 
   it('equal-item', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ id: 1, cc: 'bb' }],
       oldVal: [{ id: 1, cc: 'bb' }],
       options: {
@@ -406,18 +392,21 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
+        sortName: 'index'
       }
     })).toEqual({
       lines: [{
         id: 1,
         rowState: 'noChange',
+        index: 1,
       }],
       sortChanged: false,
     })
   })
 
   it('remove-item', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [],
       oldVal: [{ id: 1, cc: 'bb' }],
       options: {
@@ -435,18 +424,18 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
       }
     })).toEqual({
       lines: [{
         id: 1,
         rowState: 'deleted',
       }],
-      sortChanged: true,
     })
   })
 
   it('add-item', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ id: 1, cc: 'bb' }, { id: 2, cc: 'bbc' }],
       oldVal: [{ id: 1, cc: 'bb' }],
       options: {
@@ -464,22 +453,26 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
+        sortName: '11'
       }
     })).toEqual({
       lines: [{
         id: 1,
         rowState: 'noChange',
+        11: 1
       }, {
         id: 2,
         cc: 'bbc',
         rowState: 'added',
+        11: 2
       }],
-      sortChanged: true,
+      sortChanged: true
     })
   })
 
   it('add-item-sort', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ id: 2, cc: 'bbc' }, { id: 1, cc: 'bb' },],
       oldVal: [{ id: 1, cc: 'bb' }],
       options: {
@@ -497,15 +490,19 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
+        sortName: '222'
       }
     })).toEqual({
       lines: [{
         id: 2,
         cc: 'bbc',
         rowState: 'added',
+        222: 1
       }, {
         id: 1,
         rowState: 'noChange',
+        222: 2
       }],
       sortChanged: true,
     })
@@ -513,7 +510,7 @@ describe('simple-list-diff', () => {
 
 
   it('modifie-item', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ id: 1, cc: 'bbc' }],
       oldVal: [{ id: 1, cc: 'bb' }],
       options: {
@@ -531,6 +528,7 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
       }
     })).toEqual({
       lines: [{
@@ -538,12 +536,11 @@ describe('simple-list-diff', () => {
         cc: 'bbc',
         rowState: 'modified',
       }],
-      sortChanged: false,
     })
   })
 
   it('change-all-item', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ id: 1, cc: 'bbc' }, { bb: '123' }],
       oldVal: [{ id: 1, cc: 'bb' }, { id: 2, cc: 'bdf' }],
       options: {
@@ -561,6 +558,7 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
       }
     })).toEqual({
       lines: [{
@@ -574,12 +572,11 @@ describe('simple-list-diff', () => {
         id: 2,
         rowState: "deleted",
       }],
-      sortChanged: true,
     })
   })
 
   it('change-all-item-all-count', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ bb: '123' }, { id: 1, cc: 'bbc' },],
       oldVal: [{ id: 1, cc: 'bb' }, { id: 2, cc: 'bdf' }],
       options: {
@@ -598,6 +595,7 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
       }
     })).toEqual({
       lines: [ {
@@ -614,12 +612,11 @@ describe('simple-list-diff', () => {
       addedCount: 1,
       modifiedCount: 1,
       deletedCount: 1,
-      sortChanged: true
     })
   })
 
   it('change-all-item-all-count', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ bb: '123' }, { id: 1, cc: 'bbc' },],
       oldVal: [{ id: 1, cc: 'bb' }, {id: 3, cc: 234}, { id: 2, cc: 'bdf' }],
       options: {
@@ -638,15 +635,19 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
+        sortName: 'index',
       }
     })).toEqual({
       lines: [ {
         bb: '123',
         rowState: 'added',
+        index: 1
       },{
         cc: "bbc",
         id: 1,
         rowState: "modified",
+        index: 2
       }, {
         id: 3,
         rowState: "deleted",
@@ -663,7 +664,7 @@ describe('simple-list-diff', () => {
 
 
   it('change-all-item-all-count-sort', () => {
-    expect(simpleListDiffWithSort({
+    expect(simpleListDiff({
       newVal: [{ id: 2, cc: 'bdf' }, { id: 3, bb: '333' }, { id: 1, cc: 'bb' }],
       oldVal: [{ id: 1, cc: 'bb' }, { id: 3, bb: '333' }, { id: 2, cc: 'bdf' }],
       options: {
@@ -682,17 +683,22 @@ describe('simple-list-diff', () => {
           return { id: newLine.id, ...result }
         },
         key: 'id',
+        isSplit: false,
+        sortName: 'index'
       }
     })).toEqual({
       lines: [{
         id: 2,
         rowState: 'noChange',
+        index: 1
       }, {
         id: 3,
         rowState: 'noChange',
+        index: 2
       }, {
         id: 1,
         rowState: "noChange",
+        index: 3
       }],
       addedCount: 0,
       modifiedCount: 0,
@@ -701,5 +707,91 @@ describe('simple-list-diff', () => {
     })
   })
 
+
+  it('change-all-item-all-count-sort', () => {
+    expect(simpleListDiff({
+      newVal: [{ id: 2, cc: 'bdf' }, { id: 3, bb: '333' }, { id: 1, cc: 'bb' }],
+      oldVal: [{ id: 1, cc: 'bb' }, { id: 3, bb: '333' }, { id: 2, cc: 'bdf' }],
+      options: {
+        fields: ['addedCount', 'modifiedCount', 'deletedCount'],
+        getChangedItem: ({
+          newLine,
+          oldLine,
+        }) => {
+          const result = simpleObjDiff({
+            newVal: newLine,
+            oldVal: oldLine,
+          })
+          if (!Object.keys(result).length) {
+            return null
+          }
+          return { id: newLine.id, ...result }
+        },
+        key: 'id',
+        sortName: 'index',
+        isSplit: false,
+      }
+    })).toEqual({
+      lines: [{
+        id: 2,
+        rowState: 'noChange',
+        index: 1
+      }, {
+        id: 3,
+        rowState: 'noChange',
+        index: 2
+      }, {
+        id: 1,
+        rowState: "noChange",
+        index: 3
+      }],
+      addedCount: 0,
+      modifiedCount: 0,
+      deletedCount: 0,
+      sortChanged: true,
+    })
+  })
+
+
+  it('add-item-sort', () => {
+    expect(simpleListDiff({
+      newVal: [{ id: 2, cc: 'bbc' }, { id: 1, cc: 'bb' },],
+      oldVal: [{ id: 1, cc: 'bb' }],
+      options: {
+        getChangedItem: ({
+          newLine,
+          oldLine,
+        }) => {
+          const result = simpleObjDiff({
+            newVal: newLine,
+            oldVal: oldLine,
+          })
+          if (!Object.keys(result).length) {
+            return null
+          }
+          return { id: newLine.id, ...result }
+        },
+        key: 'id',
+        sortName: '222'
+      }
+    })).toEqual({
+      addedLines: [
+        {
+          id: 2,
+          cc: 'bbc',
+          222: 1
+        }
+      ],
+      noChangeLines: [
+        {
+          id: 1,
+          222: 2
+        }
+      ],
+      deletedLines: [],
+      modifiedLines: [],
+      sortChanged: true,
+    })
+  })
 
 })
