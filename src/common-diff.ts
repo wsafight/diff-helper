@@ -1,10 +1,10 @@
 import { EmptyVal, isDate, isEmpty, isObject } from "./utils"
 
 const diff = (newVal: any, oldVal: any,  empty: EmptyVal = null): any => {
-  if (oldVal === undefined || oldVal === '') {
+  if (oldVal === undefined) {
     oldVal = null
   }
-  if (newVal === undefined || newVal === '') {
+  if (newVal === undefined) {
     newVal = null
   }
 
@@ -23,7 +23,9 @@ const diff = (newVal: any, oldVal: any,  empty: EmptyVal = null): any => {
     return newVal
   }
 
-  const diffResult: Record<string, any> = {}
+  const diffResult: Record<string, any> = {
+    type: Array.isArray(newVal) ? 'array': 'obj'
+  }
 
   const checkedKeys: Set<string> = new Set<string>();
 
