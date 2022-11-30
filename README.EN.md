@@ -114,8 +114,7 @@ This method can be used to obtain the comparison result of two data rows. You ne
 | options.getChangedItem | Comparison function, if it returns null, it is considered that there is no modification, otherwise it returns the difference value of the two objects | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
 | options.key | 
 Primary key, the unique value determined by the object | string | 'id' |
-| options.isSplit | Whether to split or not, it is an object array carrying rowState | boolean | true |
-| options.fields | For multi-returned data, when isSplit is not false, there is generally no need to change the parameters | ['addedCount', 'deletedCount', 'modifiedCount'] | [] |
+| options.sortName | Sorting name, the data will be inserted into the object array (index+1) | string | '' |
 
 #### example
 
@@ -159,6 +158,28 @@ result = {
   modifiedLines: [],
 };
 
+// You can not pass getChangedItem. SimpleObjDiff is used by default
+simpleListDiff({
+  newVal: [{
+    id: 1,
+    cc: "bb",
+  }],
+  oldVal: [{
+    id: 1,
+    cc: "bb",
+  }],
+  options: {
+    // The primary key is id
+    key: "id",
+  },
+});
+// No additions, modifications and deletions
+result = {
+  addedLines: [],
+  deletedLines: [],
+  modifiedLines: [],
+};
+
 // getChangedItem may not be passed. By default simpleObjDiff is used
 simpleListDiff({
   newVal: [{
@@ -186,181 +207,66 @@ result = {
 };
 
 simpleListDiff({
-  newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
+  newVal: [
+    { id: 2, cc: "bdf" },
+    { id: 3, bb: "333" },
+    { id: 1, cc: "bb" },
+  ],
+  oldVal: [
+    { id: 1, cc: "bb" },
+    { id: 3, bb: "333" },
+    { id: 2, cc: "bdf" },
+  ],
   options: {
     key: "id",
-    // whether to split
-    isSplit: false,
+    sortName: "sortIndex",
   },
 });
-// Get a separate array without splitting, rowState is added deleted modified
+// Only the positions of 1 and 3 have changed
 result = {
-  lines: [
-    {
-      id: 1,
-      cc: "bbc",
-      rowState: "modified",
-    },
-    {
-      bb: "123",
-      rowState: "added",
-    },
-    {
-      id: 2,
-      rowState: "deleted",
-    },
-  ],
+  addedLines: [],
+  deletedLines: [],
+  modifiedLines: [],
+  // The location information is provided here. The middle 3 has not changed and will not be processed
+  noChangeLines: [{
+    id: 2,
+    sortIndex: 1,
+  }, {
+    id: 1,
+    sortIndex: 3,
+  }],
 };
 
 simpleListDiff({
-  newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
+  newVal: [{ id: 2, cc: "bbc" }, { id: 1, cc: "bb" }],
+  oldVal: [{ id: 1, cc: "bb" }],
   options: {
     key: "id",
-    // whether to split
-    isSplit: false,
-    // Carry more data
-    fields: ["addedCount", "modifiedCount", "deletedCount"],
+    sortName: "sortIndex",
   },
 });
-// You can get more added quantity, modified quantity and deleted quantity
+// It also supports adding sortIndex for new and modified data
 result = {
-  lines: [
-    {
-      id: 1,
-      cc: "bbc",
-      rowState: "modified",
-    },
-    {
-      bb: "123",
-      rowState: "added",
-    },
+  addedLines: [
     {
       id: 2,
-      rowState: "deleted",
+      cc: "bbc",
+      // The new data is currently numbered 1
+      sortIndex: 1,
     },
   ],
-  addedCount: 1,
-  modifiedCount: 1,
-  deletedCount: 2,
-};
-```
-
-### Array sort comparison function simpleListDiffWithSort
-
-This method can be used to obtain the comparison result of two data rows. At the same time, the sorted information is also maintained.
-
-#### parameter
-
-| parameter | desc | type | default |
-| :-- | :--| :-- | :-- |
-| newVal | new array | any[] | - |
-| oldVal | old array | any[] | - |
-| options.getChangedItem | Comparison function, if it returns null, it is considered that there is no modification, otherwise it returns the difference value of the two objects | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
-| options.key | 
-Primary key, the unique value determined by the object | string | 'id' |
-| options.fields | Multiple returned data | ['addedCount','deletedCount', 'modifiedCount'] | [] |
-
-#### example
-
-```ts
-simpleListDiffWithSort({
-  newVal: [{
-    id: 1,
-    cc: "bbc",
-  }, {
-    bb: "123",
-  }],
-  oldVal: [{
-    id: 1,
-    cc: "bb",
-  }, {
-    id: 2,
-    cc: "bdf",
-  }],
-  options: {
-    key: "id",
-  },
-});
-// Due to the need for sorting, no splitting is performed, and the sortChanged parameter will be carried
-result = {
-  lines: [{
-    cc: "bbc",
-    id: 1,
-    rowState: "modified",
-  }, {
-    bb: "123",
-    rowState: "added",
-  }, {
-    id: 2,
-    rowState: "deleted",
-  }],
-  sortChanged: true,
-};
-
-simpleListDiffWithSort({
-  newVal: [{ id: 2, cc: "bdf" }, { id: 3, bb: "333" }, { id: 1, cc: "bb" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 3, bb: "333" }, { id: 2, cc: "bdf" }],
-  options: {
-    // Quantity available at this time
-    fields: [
-      "addedCount",
-      "modifiedCount",
-      "deletedCount",
-    ],
-    key: "id",
-  },
-});
-// At this time, there is no addition, deletion, modification, only sequential modification
-result = {
-  lines: [{
-    id: 2,
-    rowState: "noChange",
-  }, {
-    id: 3,
-    rowState: "noChange",
-  }, {
-    id: 1,
-    rowState: "noChange",
-  }],
-  addedCount: 0,
-  modifiedCount: 0,
-  deletedCount: 0,
-  sortChanged: true,
-};
-
-simpleListDiffWithSort({
-  newVal: [{ bb: "123" }, { id: 1, cc: "bbc" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 3, cc: 234 }, { id: 2, cc: "bdf" }],
-  options: {
-    key: "id",
-  },
-});
-// The current order will determine the order according to the value of newVal, and deletion will be at the end
-result = {
-  lines: [{
-    bb: "123",
-    rowState: "added",
-  }, {
-    cc: "bbc",
-    id: 1,
-    rowState: "modified",
-  }, {
-    id: 3,
-    rowState: "deleted",
-  }, {
-    id: 2,
-    rowState: "deleted",
-  }],
-  addedCount: 1,
-  modifiedCount: 1,
-  deletedCount: 2,
-  sortChanged: true,
+  noChangeLines: [{
+      id: 1,
+      sortIndex: 2,
+  },],
+  deletedLines: [],
+  modifiedLines: [],
 };
 ```
 
 ## Changelog
+- 1.0.0 Remove the simpleListDiffWithSort function and remove unnecessary parameters in the simpleListDiff function
+
 - 0.0.5 Configure available default items for options.getChangedItem of simpleListDiff and simpleListDiffWithSort
 
 - 0.0.4 Added simpleListDiff and simpleListDiffWithSort functions and tests

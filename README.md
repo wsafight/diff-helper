@@ -3,7 +3,8 @@
 [![Build Status](https://www.travis-ci.org/wsafight/diff-helper.svg?branch=main)](https://www.travis-ci.org/wsafight/diff-helper)
 [![NPM Version](https://badgen.net/npm/v/diff-helper)](https://www.npmjs.com/package/diff-helper)
 
-Read this in other languages: [English](https://github.com/wsafight/diff-helper/blob/main/README.EN.md)
+Read this in other languages:
+[English](https://github.com/wsafight/diff-helper/blob/main/README.EN.md)
 
 基于实际业务的比对辅助库
 
@@ -38,13 +39,13 @@ yarn add diff-helper
 
 #### 参数
 
-| 参数 | 说明 | 类型 | 默认值 |
-| :-- | :--| :-- | :-- |
-| newVal | 新对象 | Record<string,any> | - |
-| oldVal | 老对象 | Record<string,any> | - |
-| options.empty | 属性删除时的属性值 | null ｜ '' | null |
-| options.diffFun | 比对函数，返回为 null 时候使用新对象的数值 | (key: string, newVal: any, oldVal: any) => any | undefined |
-| options.needClone | 是否对新属性进行简单（JSON）深拷贝 | boolean | false |
+| 参数                | 说明                       | 类型                                             | 默认值       |
+| :---------------- | :----------------------- | :--------------------------------------------- | :-------- |
+| newVal            | 新对象                      | Record<string,any>                             | -         |
+| oldVal            | 老对象                      | Record<string,any>                             | -         |
+| options.empty     | 属性删除时的属性值                | null ｜ ''                                      | null      |
+| options.diffFun   | 比对函数，返回为 null 时候使用新对象的数值 | (key: string, newVal: any, oldVal: any) => any | undefined |
+| options.needClone | 是否对新属性进行简单（JSON）深拷贝      | boolean                                        | false     |
 
 #### 例子
 
@@ -110,14 +111,13 @@ simpleObjDiff({
 
 #### 参数
 
-| 参数 | 说明 | 类型 | 默认值 |
-| :-- | :--| :-- | :-- |
-| newVal | 新数组 | any[] | - |
-| oldVal | 老数组 | any[] | - |
+| 参数                     | 说明                                 | 类型                          | 默认值                                            |
+| :--------------------- | :--------------------------------- | :-------------------------- | :--------------------------------------------- |
+| newVal                 | 新数组                                | any[]                       | -                                              |
+| oldVal                 | 老数组                                | any[]                       | -                                              |
 | options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
-| options.key | 主键,对象判定的唯一值 | string | 'id' |
-| options.isSplit | 是否进行拆分，不拆分则是一个携带 rowState 的对象数组 | boolean | true |
-| options.fields | 多返回的数据,isSplit 不为 false 时候一般不需要改参数 | ['addedCount','deletedCount', 'modifiedCount'] | [] |
+| options.key            | 主键,对象判定的唯一值                        | string                      | 'id'                                           |
+| options.sortName       | 排序名称，会在对象数组中插入该数据(index + 1)       | string                      | ''                                             |
 
 #### 例子
 
@@ -209,185 +209,73 @@ result = {
 };
 
 simpleListDiff({
-  newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
+  newVal: [
+    { id: 2, cc: "bdf" },
+    { id: 3, bb: "333" },
+    { id: 1, cc: "bb" },
+  ],
+  oldVal: [
+    { id: 1, cc: "bb" },
+    { id: 3, bb: "333" },
+    { id: 2, cc: "bdf" },
+  ],
   options: {
     key: "id",
-    // 是否进行拆分
-    isSplit: false,
+    sortName: "sortIndex",
   },
 });
-// 不进行拆分，获取一个单独的数组，rowState 分别为 added deleted modified
+// 只有 1 和 3 的位置发生了改变
 result = {
-  lines: [
-    {
-      id: 1,
-      cc: "bbc",
-      rowState: "modified",
-    },
-    {
-      bb: "123",
-      rowState: "added",
-    },
-    {
-      id: 2,
-      rowState: "deleted",
-    },
-  ],
+  addedLines: [],
+  deletedLines: [],
+  modifiedLines: [],
+  // 这里有位置的信息提供,中间的 3 没有任何改动，不做处理
+  noChangeLines: [{
+    id: 2,
+    sortIndex: 1,
+  }, {
+    id: 1,
+    sortIndex: 3,
+  }],
 };
 
 simpleListDiff({
-  newVal: [{ id: 1, cc: "bbc" }, { bb: "123" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 2, cc: "bdf" }],
+  newVal: [{ id: 2, cc: "bbc" }, { id: 1, cc: "bb" }],
+  oldVal: [{ id: 1, cc: "bb" }],
   options: {
     key: "id",
-    // 是否进行拆分
-    isSplit: false,
-    // 多携带的数据
-    fields: ["addedCount", "modifiedCount", "deletedCount"],
+    sortName: "sortIndex",
   },
 });
-// 可以多获取到添加数量，修改数量以及删除数量
+// 同样也支持为新增和修改的数据添加 sortIndex
 result = {
-  lines: [
-    {
-      id: 1,
-      cc: "bbc",
-      rowState: "modified",
-    },
-    {
-      bb: "123",
-      rowState: "added",
-    },
+  addedLines: [
     {
       id: 2,
-      rowState: "deleted",
+      cc: "bbc",
+      // 新增的数据目前序号为 1
+      sortIndex: 1,
     },
   ],
-  addedCount: 1,
-  modifiedCount: 1,
-  deletedCount: 2,
-};
-```
-
-### 数组排序比对函数 simpleListDiffWithSort
-
-可以通过该方法获取两个数据行的对比结果。同时也保持了排序之后的信息。
-
-#### 参数
-
-| 参数 | 说明 | 类型 | 默认值 |
-| :-- | :--| :-- | :-- |
-| newVal | 新数组 | any[] | - |
-| oldVal | 老数组 | any[] | - |
-| options.getChangedItem | 比对函数，返回为 null 则认为没有修改，否则返回两个对象的差异值 | ({newLine, oldLine}) => any | ({newLine, oldLine}) => diff(newLine, oldLine) |
-| options.key | 主键,对象判定的唯一值 | string | 'id' |
-| options.fields | 多返回的数据 | ['addedCount','deletedCount', 'modifiedCount'] | [] |
-
-#### 例子
-
-```ts
-simpleListDiffWithSort({
-  newVal: [{
-    id: 1,
-    cc: "bbc",
-  }, {
-    bb: "123",
-  }],
-  oldVal: [{
-    id: 1,
-    cc: "bb",
-  }, {
-    id: 2,
-    cc: "bdf",
-  }],
-  options: {
-    key: "id",
-  },
-});
-// 由于需要排序，没有进行拆分，会携带 sortChanged 参数
-result = {
-  lines: [{
-    cc: "bbc",
-    id: 1,
-    rowState: "modified",
-  }, {
-    bb: "123",
-    rowState: "added",
-  }, {
-    id: 2,
-    rowState: "deleted",
-  }],
-  sortChanged: true,
-};
-
-simpleListDiffWithSort({
-  newVal: [{ id: 2, cc: "bdf" }, { id: 3, bb: "333" }, { id: 1, cc: "bb" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 3, bb: "333" }, { id: 2, cc: "bdf" }],
-  options: {
-    // 此时可以获取数量
-    fields: [
-      "addedCount",
-      "modifiedCount",
-      "deletedCount",
-    ],
-    key: "id",
-  },
-});
-// 此时没有任何增加，删除，修改，只有顺序修改
-result = {
-  lines: [{
-    id: 2,
-    rowState: "noChange",
-  }, {
-    id: 3,
-    rowState: "noChange",
-  }, {
-    id: 1,
-    rowState: "noChange",
-  }],
-  addedCount: 0,
-  modifiedCount: 0,
-  deletedCount: 0,
-  sortChanged: true,
-};
-
-simpleListDiffWithSort({
-  newVal: [{ bb: "123" }, { id: 1, cc: "bbc" }],
-  oldVal: [{ id: 1, cc: "bb" }, { id: 3, cc: 234 }, { id: 2, cc: "bdf" }],
-  options: {
-    key: "id",
-  },
-});
-// 当前顺序会根据 newVal 的值来决定顺序，删除会在最后
-result = {
-  lines: [{
-    bb: "123",
-    rowState: "added",
-  }, {
-    cc: "bbc",
-    id: 1,
-    rowState: "modified",
-  }, {
-    id: 3,
-    rowState: "deleted",
-  }, {
-    id: 2,
-    rowState: "deleted",
-  }],
-  addedCount: 1,
-  modifiedCount: 1,
-  deletedCount: 2,
-  sortChanged: true,
+  noChangeLines: [{
+      id: 1,
+      sortIndex: 2,
+  },],
+  deletedLines: [],
+  modifiedLines: [],
 };
 ```
 
 ## Changelog
-- 0.0.5 为 simpleListDiff 和 simpleListDiffWithSort 的 options.getChangedItem 配置可用的默认项
+
+- 1.0.0 移除 simpleListDiffWithSort 函数以及 simpleListDiff 函数中的不必要的参数
+
+- 0.0.5 为 simpleListDiff 和 simpleListDiffWithSort 的 options.getChangedItem
+  配置可用的默认项
 
 - 0.0.4 添加了 simpleListDiff 和 simpleListDiffWithSort 函数以及测试
 
 - 0.0.3 修复了 simpleObjDiff diffFun 返回 false 问题，修改了 simpleObjDiff 传参结构，添加了
   isSimpleObjChange 函数
-  
+
 - 0.0.2 基本可用，支持 simpleObjDiff 以及 simpleListDiff

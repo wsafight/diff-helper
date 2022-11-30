@@ -59,7 +59,6 @@ export const simpleListDiff = ({
 
   if (!hasValForArray(oldVal)) {
     return {
-      ...hasSortName && { sortChanged: true },
       addedLines: newVal.map(item => ({
         ...item,
       })),
