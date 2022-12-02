@@ -27,6 +27,12 @@
       "pre-commit": "tsdx lint"
     }
   },
+  "keywords": [
+    "diff",
+    "business",
+    "obj-diff",
+    "list-diff"
+  ],
   "prettier": {
     "printWidth": 80,
     "semi": true,
